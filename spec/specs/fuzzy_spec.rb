@@ -42,6 +42,12 @@ describe Fuzzy do
     matcher.match_file("b/e/g", "a/b/c/d/e/f/g").should be_true
   end
 
+  it "should match deep search with deep path with partial file names" do
+    matcher.match_file("b/e/g", "aa/bb/cc/dd/ee/ff/gg").should be_true
+    matcher.match_file("b/e/g", "az/bz/cz/dz/ez/fz/gz").should be_true
+    matcher.match_file("b/e/g", "zaz/zbz/zcz/zdz/zez/zfz/zgz").should be_true
+  end
+
 end
 
 
