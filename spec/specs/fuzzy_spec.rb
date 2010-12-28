@@ -3,14 +3,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe Fuzzy do
   
   def files
-    ["README.md", "spec", "autotest", "lib", "spec/specs", 
-      "spec/spec_helper.rb", "spec/specs/fuzzy_spec.rb", 
-      "autotest/discover.rb", "lib/matcher.rb", "lib/matcher", 
-      "lib/matcher/fuzzy.rb"]
+    ["README.md", "spec/spec_helper.rb", 
+      "spec/specs/fuzzy_spec.rb", "autotest/discover.rb", 
+      "lib/matcher.rb", "lib/matcher/fuzzy.rb"]
   end
   
   context "filter" do
+    it "should match only files without directories with the same name" do
+      Fuzzy.match("spec", files).should == ["spec/spec_helper.rb",
+                                            "spec/specs/fuzzy_spec.rb"]
+    end
     
+    it "should match single letter search only to filenames" do
+      Fuzzy.match("m", files).should == ["README.md", "lib/matcher.rb"]
+      Fuzzy.match("R", files).should == ["README.md"]
+    end
+    
+    it "should match specific nested search only to one file" do
+      Fuzzy.match("l/m", files).should == ["lib/matcher.rb"]
+      Fuzzy.match("s/f", files).should == ["spec/specs/fuzzy_spec.rb"]
+    end
+    
+    it "should match specific deeply nested search only to one file" do
+      Fuzzy.match("s/s/f", files).should == ["spec/specs/fuzzy_spec.rb"]
+    end
   end
 
   context "file match" do
@@ -62,12 +78,20 @@ describe Fuzzy do
         "b/e/g".should match_file("az/bz/cz/dz/ez/fz/gz")
         "b/e/g".should match_file("zaz/zbz/zcz/zdz/zez/zfz/zgz")
       end
+      
+      it "should work" do
+        "s/f".should_not match_file("lib/matcher/fuzzy.rb")
+      end
     end
   end
   
   context "string match" do
     it "should match repetitive characters" do
       "g".should match_string("gg")
+    end
+    
+    it "should work" do
+      "s".should_not match_string("f")
     end
     
     it "should match exact string" do

@@ -1,6 +1,5 @@
 module Matcher
   class Fuzzy
-    
     # Matches all files with the search string  
     #
     # == Parameters:
@@ -47,30 +46,31 @@ module Matcher
         # doesn't match if search is deeper than the file, 
         # eg. search: a/b and file is only b
         # or doesn't match the filename
-        if file_path.size == 0 || !Fuzzy.match_string(pattern, file)
-          puts "ERR: #{pattern} didn't match #{file}"
-          return false 
-        end
+        return false if file_path.size == 0 || !Fuzzy.match_string(pattern, file)
         pattern = pattern_path.shift
         file = file_path.shift
         
         while true
-          pattern = pattern_path.shift if file.match(pattern)
-          file = file_path.shift
-            
-          return true if pattern_path.empty?
-          if file_path.empty? && !pattern_path.empty?          
-            puts "ERR: file got empty before pattern"
-            return false 
+          matched = false
+          if Fuzzy.match_string(pattern, file)
+            pattern = pattern_path.shift 
+            matched = true
           end
+          file = file_path.shift
+          
+          return false if file_path.empty? && !matched          
+          return true if pattern_path.empty? && matched
         end
       else
-        file.match(pattern)          
+        Fuzzy.match_string(pattern, file)
       end      
     end
     
-    #
+    
+    # Fuzzy match on two strings
+    # returns true if they match, false otherwise
     def self.match_string(text, string)
+      return false if string == nil
       pattern = text.split ""
       target = string.split ""
       last = 0
