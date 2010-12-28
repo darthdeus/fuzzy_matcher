@@ -46,8 +46,9 @@ module Matcher
       if pattern_path && pattern_path.size > 0
         # doesn't match if search is deeper than the file, eg. search: a/b and file is only b
         # or doesn't match the filename
-        return false if file_path.size == 0 || !file.match(pattern)
-          
+        if file_path.size == 0 || !file.match(pattern)
+          return false 
+        end
         pattern = pattern_path.shift
         file = file_path.shift
         
@@ -60,8 +61,24 @@ module Matcher
         end
       else
         file.match(pattern)          
-      end
-    end
+      end      
+     end
     
+    def self.match_string(text, string)
+      pattern = text.split ""
+      target = string.split ""
+      last = 0
+      
+      while not pattern.empty?
+        letter = pattern.shift
+        i = target.index(letter)
+        return false unless i
+        
+        last = i + 1
+        target = target[last..-1]
+      end
+      true
+    end
+        
   end  
 end
