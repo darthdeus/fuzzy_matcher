@@ -44,9 +44,11 @@ module Matcher
       
       # if there is path specified in the search
       if pattern_path && pattern_path.size > 0
-        # doesn't match if search is deeper than the file, eg. search: a/b and file is only b
+        # doesn't match if search is deeper than the file, 
+        # eg. search: a/b and file is only b
         # or doesn't match the filename
-        if file_path.size == 0 || !file.match(pattern)
+        if file_path.size == 0 || !Fuzzy.match_string(pattern, file)
+          puts "ERR: #{pattern} didn't match #{file}"
           return false 
         end
         pattern = pattern_path.shift
@@ -57,13 +59,17 @@ module Matcher
           file = file_path.shift
             
           return true if pattern_path.empty?
-          return false if file_path.empty? && !pattern_path.empty?          
+          if file_path.empty? && !pattern_path.empty?          
+            puts "ERR: file got empty before pattern"
+            return false 
+          end
         end
       else
         file.match(pattern)          
       end      
-     end
+    end
     
+    #
     def self.match_string(text, string)
       pattern = text.split ""
       target = string.split ""

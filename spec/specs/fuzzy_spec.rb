@@ -2,60 +2,74 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Fuzzy do
   
-  let(:matcher) { Fuzzy }
-  
   def files
-    ["foo", "foo/bar", "foo/bar/baz"]
+    ["README.md", "spec", "autotest", "lib", "spec/specs", 
+      "spec/spec_helper.rb", "spec/specs/fuzzy_spec.rb", 
+      "autotest/discover.rb", "lib/matcher.rb", "lib/matcher", 
+      "lib/matcher/fuzzy.rb"]
   end
   
+  context "filter" do
+    
+  end
+
   context "file match" do
+    context "wihout directory" do
+      it "should match exact file name" do
+        "foo".should match_file("foo")
+      end
     
-    it "should match exact file name" do
-      "foo".should match_file("foo")
+      it "should match partial file name" do
+        "f".should match_file("foo")
+      end
     end
     
-    it "should match partial file name" do
-      "f".should match_file("foo")
+    context "with single nesting" do
+      it "should match nested file name" do
+        "bar".should match_file("foo/bar")
+      end
+      
+      it "should match exact absolute path" do
+        "foo/bar".should match_file("foo/bar")
+      end
     end
     
-    it "should match nested file name" do
-      "bar".should match_file("foo/bar")
-    end
-    
-    it "should match exact absolute path" do
-      "foo/bar".should match_file("foo/bar")
-    end
-    
-    it "should match partial path" do
-      "foo/bar".should match_file("foo/baz/bar")
-    end
-    
-    it "should match deep partial path" do
-      "foo/bar".should match_file("foo/baz/flux/buz/bar")
-    end
-    
-    it "should match partial filenames with deep path" do
-      "f/b".should match_file("foo/baz/flux/buz/bar")
-      "f/ba".should match_file("foo/baz/flux/buz/bar")
-      "f/bar".should match_file("foo/baz/flux/buz/bar")
-      "fo/bar".should match_file("foo/baz/flux/buz/bar")
-      "foo/bar".should match_file("foo/baz/flux/buz/bar")
-      "foo/ba".should match_file("foo/baz/flux/buz/bar")
-      "foo/b".should match_file("foo/baz/flux/buz/bar")
-    end
-    
-    it "should match deep search with deep path" do
-      "b/e/g".should match_file("a/b/c/d/e/f/g")
-    end
-    
-    it "should match deep search with deep path with partial file names" do
-      "b/e/g".should match_file("aa/bb/cc/dd/ee/ff/gg")
-      "b/e/g".should match_file("az/bz/cz/dz/ez/fz/gz")
-      "b/e/g".should match_file("zaz/zbz/zcz/zdz/zez/zfz/zgz")
+    context "deep path" do
+      it "should match partial path" do
+        "foo/bar".should match_file("foo/baz/bar")
+      end
+      
+      it "should match deep partial path" do
+        "foo/bar".should match_file("foo/baz/flux/buz/bar")
+      end
+      
+      it "should match partial filenames with deep path" do
+        "f/b".should match_file("foo/baz/flux/buz/bar")
+        "f/ba".should match_file("foo/baz/flux/buz/bar")
+        "f/bar".should match_file("foo/baz/flux/buz/bar")
+        "fo/bar".should match_file("foo/baz/flux/buz/bar")
+        "foo/bar".should match_file("foo/baz/flux/buz/bar")
+        "foo/ba".should match_file("foo/baz/flux/buz/bar")
+        "foo/b".should match_file("foo/baz/flux/buz/bar")
+      end
+      
+      it "should match deep search with deep path" do
+        "b/e/g".should match_file("a/b/c/d/e/f/g")
+      end
+      
+      it "should match deep search with deep path with partial file names" do
+        "b/e/g".should match_file("aa/bb/cc/dd/ee/ff/gg")
+        "b/e/g".should match_file("az/bz/cz/dz/ez/fz/gz")
+        "b/e/g".should match_file("zaz/zbz/zcz/zdz/zez/zfz/zgz")
+      end
     end
   end
   
   context "string match" do
+    it "should match repetitive characters" do
+      "g".should match_string("gg")
+    end
+    
     it "should match exact string" do
       "foo".should match_string("foo")
     end
@@ -65,7 +79,6 @@ describe Fuzzy do
     end
     
     it "should match fuzzy partial string" do
-      "f".should match_string("foo")
       "ur".should match_string("user")
       "usr".should match_string("user")
       "uc".should match_string("users_controller")
@@ -81,6 +94,7 @@ describe Fuzzy do
       "users_ctrrl".should_not match_string("users_controller")
     end
   end
+  
 end
 
 
